@@ -1,5 +1,7 @@
 package nl.dstibbe.labs.axon.cargo.aggregates
 
+import nl.dstibbe.labs.axon.cargo.commands.SendCargo
+import nl.dstibbe.labs.axon.cargo.ids.CargoId
 import org.axonframework.test.aggregate.AggregateTestFixture
 import org.axonframework.test.aggregate.FixtureConfiguration
 import org.junit.Before
@@ -15,8 +17,9 @@ class CargoTest {
 
     @Test
     fun startingWithCargo(){
+
         fixture.givenNoPriorActivity()
-                .`when`(object{})
+                .`when`(SendCargo(CargoId("abx123")))
                 .expectNoEvents()
     }
 

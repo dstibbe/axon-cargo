@@ -1,14 +1,17 @@
 package nl.dstibbe.labs.axon.cargo.aggregates
 
 import nl.dstibbe.labs.axon.cargo.Logger
+import nl.dstibbe.labs.axon.cargo.commands.OnboardCargo
 import nl.dstibbe.labs.axon.cargo.commands.SendCargo
 import nl.dstibbe.labs.axon.cargo.events.CargoCreated
+import nl.dstibbe.labs.axon.cargo.events.CargoOnboarded
 import nl.dstibbe.labs.axon.cargo.ids.CargoId
 import org.axonframework.commandhandling.CommandHandler
 import org.axonframework.eventhandling.EventHandler
 import org.axonframework.modelling.command.AggregateIdentifier
 import org.axonframework.modelling.command.AggregateLifecycle
 import org.axonframework.spring.stereotype.Aggregate
+import java.lang.IllegalStateException
 
 @Aggregate
 class Cargo() {
@@ -17,16 +20,35 @@ class Cargo() {
     @AggregateIdentifier
     lateinit var id: CargoId
 
+    var onboarded = false
+
     @CommandHandler
     constructor(command: SendCargo) : this() {
-        log.info("[HANDLE COMMAND] SendCargo" )
+        log.info("[HANDLE COMMAND] SendCargo")
         AggregateLifecycle.apply(CargoCreated(command.id))
     }
 
+    @CommandHandler
+    fun onboard(command: OnboardCargo) {
+        log.info("[HANDLE COMMAND] OnboardCargo")
+        if (onboarded) {
+            throw IllegalStateException("Cannot onboard, since it is already onboarded")
+        }
+        AggregateLifecycle.apply(CargoOnboarded(command.id))
+    }
+
+
     @EventHandler
     fun createCargo(event: CargoCreated) {
-        log.info("[APPLY EVENT] CargoCreated" )
+        log.info("[APPLY EVENT] CargoCreated")
         this.id = event.id
+    }
+
+
+    @EventHandler
+    fun createCargo(event: CargoOnboarded) {
+        log.info("[APPLY EVENT] CargoOnboarded")
+        this.onboarded = true
     }
 
 

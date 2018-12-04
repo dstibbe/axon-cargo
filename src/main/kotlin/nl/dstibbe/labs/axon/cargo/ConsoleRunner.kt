@@ -23,7 +23,7 @@ class ConsoleRunner : CommandLineRunner {
     lateinit var commandGateway: CommandGateway
 
     override fun run(vararg args: String?) {
-        val targetId = CargoId("Hello World")
+        val targetId = CargoId("Hello World ${System.currentTimeMillis()}" )
 
 
         log.info("[SEND COMMAND] SendCargo")
